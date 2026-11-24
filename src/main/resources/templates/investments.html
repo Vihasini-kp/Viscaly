@@ -1,0 +1,667 @@
+
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Investments | Viscaly</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary: #4776e6;
+            --secondary: #27c2d8;
+            --dark: #172b4d;
+            --muted: #8492a6;
+            --background: #f3f7fd;
+            --card: #ffffff;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            background: var(--background);
+            color: var(--dark);
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 245px;
+            height: 100vh;
+            padding: 28px 18px;
+            background: white;
+            border-right: 1px solid #e9eef6;
+            z-index: 100;
+        }
+
+        .brand {
+            font-size: 27px;
+            font-weight: 800;
+            letter-spacing: -1px;
+            color: var(--primary);
+            padding: 0 12px;
+        }
+
+        .brand span {
+            color: var(--secondary);
+        }
+
+        .tagline {
+            font-size: 10px;
+            color: var(--muted);
+            padding-left: 13px;
+            margin-bottom: 38px;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 13px;
+            padding: 12px 14px;
+            margin-bottom: 7px;
+            border-radius: 11px;
+            color: #718096;
+            font-size: 14px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: 0.2s;
+        }
+
+        .nav-link:hover,
+        .nav-link.active {
+            background: #edf3ff;
+            color: var(--primary);
+        }
+
+        .nav-link i {
+            font-size: 18px;
+        }
+
+        .main-content {
+            margin-left: 245px;
+            padding: 30px 35px;
+        }
+
+        .topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .page-title {
+            font-size: 25px;
+            font-weight: 750;
+            margin: 0;
+        }
+
+        .welcome {
+            color: var(--muted);
+            font-size: 13px;
+            margin-top: 5px;
+        }
+
+        .profile {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: white;
+            padding: 9px 15px;
+            border-radius: 12px;
+            box-shadow: 0 3px 15px rgba(30, 60, 100, 0.04);
+        }
+
+        .profile-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: #eaf1ff;
+            color: var(--primary);
+            display: grid;
+            place-items: center;
+        }
+
+        .profile-name {
+            font-size: 13px;
+            font-weight: 650;
+        }
+
+        .stat-card {
+            background: var(--card);
+            border-radius: 17px;
+            padding: 22px;
+            height: 100%;
+            box-shadow: 0 5px 20px rgba(30, 60, 100, 0.04);
+        }
+
+        .stat-label {
+            color: var(--muted);
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .stat-value {
+            font-size: 25px;
+            font-weight: 750;
+            margin-top: 13px;
+            color: var(--dark);
+            overflow-wrap: anywhere;
+        }
+
+        .stat-icon {
+            width: 43px;
+            height: 43px;
+            border-radius: 12px;
+            display: grid;
+            place-items: center;
+            font-size: 20px;
+        }
+
+        .blue {
+            background: #eaf1ff;
+            color: #4776e6;
+        }
+
+        .cyan {
+            background: #e4faff;
+            color: #16a9c5;
+        }
+
+        .green {
+            background: #e6f8ef;
+            color: #20a66a;
+        }
+
+        .red {
+            background: #fff0f0;
+            color: #e15b64;
+        }
+
+        .content-card {
+            background: white;
+            border-radius: 17px;
+            padding: 24px;
+            box-shadow: 0 5px 20px rgba(30, 60, 100, 0.04);
+        }
+
+        .section-title {
+            font-size: 17px;
+            font-weight: 750;
+            margin-bottom: 5px;
+        }
+
+        .section-subtitle {
+            font-size: 12px;
+            color: var(--muted);
+        }
+
+        .form-control,
+        .form-select {
+            border: 1px solid #e5eaf2;
+            border-radius: 9px;
+            padding: 11px 13px;
+            font-size: 13px;
+        }
+
+        .form-control:focus,
+        .form-select:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(71, 118, 230, 0.1);
+        }
+
+        .form-label {
+            font-size: 12px;
+            font-weight: 650;
+            color: #53647d;
+            margin-bottom: 7px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(110deg, #4776e6, #27c2d8);
+            border: none;
+            border-radius: 9px;
+            padding: 11px 19px;
+            font-size: 13px;
+            font-weight: 650;
+        }
+
+        .btn-primary:hover {
+            opacity: 0.9;
+        }
+
+        .table {
+            vertical-align: middle;
+            font-size: 13px;
+            min-width: 750px;
+        }
+
+        .table thead th {
+            color: #8492a6;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+            padding: 15px 12px;
+            border-bottom: 1px solid #edf0f5;
+            white-space: nowrap;
+        }
+
+        .table tbody td {
+            padding: 16px 12px;
+            border-bottom: 1px solid #f0f2f6;
+        }
+
+        .investment-name {
+            font-weight: 700;
+            color: var(--dark);
+        }
+
+        .investment-type {
+            color: var(--muted);
+            font-size: 11px;
+            margin-top: 4px;
+        }
+
+        .profit {
+            color: #20a66a;
+            font-weight: 700;
+        }
+
+        .loss {
+            color: #e15b64;
+            font-weight: 700;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 45px 15px;
+            color: var(--muted);
+        }
+
+        .empty-state i {
+            font-size: 35px;
+            color: #b9c9e8;
+        }
+
+        .empty-state h6 {
+            color: var(--dark);
+            margin-top: 12px;
+            font-weight: 700;
+        }
+
+        .search-box {
+            max-width: 230px;
+        }
+
+        .logout-btn {
+            border: none;
+            background: transparent;
+            width: 100%;
+            text-align: left;
+        }
+
+        @media (max-width: 900px) {
+            .sidebar {
+                width: 75px;
+                padding: 25px 10px;
+            }
+
+            .brand {
+                font-size: 20px;
+                padding: 0 7px;
+            }
+
+            .tagline,
+            .nav-text {
+                display: none;
+            }
+
+            .nav-link {
+                justify-content: center;
+                padding: 13px 8px;
+            }
+
+            .main-content {
+                margin-left: 75px;
+                padding: 25px 18px;
+            }
+        }
+
+        @media (max-width: 550px) {
+            .main-content {
+                padding: 20px 12px;
+            }
+
+            .topbar {
+                align-items: flex-start;
+            }
+
+            .page-title {
+                font-size: 21px;
+            }
+
+            .profile {
+                padding: 7px;
+            }
+
+            .profile-name {
+                display: none;
+            }
+
+            .content-card {
+                padding: 17px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<aside class="sidebar">
+    <div class="brand">Visca<span>ly.</span></div>
+    <div class="tagline">SMART FINANCE. CLEAR FUTURE.</div>
+
+    <nav>
+        <a href="/dashboard" class="nav-link">
+            <i class="bi bi-grid-1x2"></i>
+            <span class="nav-text">Dashboard</span>
+        </a>
+
+        <a href="/transactions" class="nav-link">
+            <i class="bi bi-arrow-left-right"></i>
+            <span class="nav-text">Transactions</span>
+        </a>
+
+        <a href="/investments" class="nav-link active">
+            <i class="bi bi-graph-up-arrow"></i>
+            <span class="nav-text">Investments</span>
+        </a>
+
+        <a href="/goals" class="nav-link">
+            <i class="bi bi-bullseye"></i>
+            <span class="nav-text">Goals & Savings</span>
+        </a>
+
+        <a href="/analytics" class="nav-link">
+            <i class="bi bi-bar-chart-line"></i>
+            <span class="nav-text">Analytics</span>
+        </a>
+
+        <form th:action="@{/logout}" method="post" class="mt-4">
+            <button type="submit" class="nav-link logout-btn">
+                <i class="bi bi-box-arrow-left"></i>
+                <span class="nav-text">Logout</span>
+            </button>
+        </form>
+    </nav>
+</aside>
+
+<main class="main-content">
+
+    <div class="topbar">
+        <div>
+            <h1 class="page-title">Investments</h1>
+            <p class="welcome">Monitor your investments and track your financial growth.</p>
+        </div>
+
+        <div class="profile">
+            <div class="profile-icon">
+                <i class="bi bi-person-fill"></i>
+            </div>
+            <span class="profile-name" th:text="${userName}">User</span>
+        </div>
+    </div>
+
+    <!-- Investment Summary -->
+    <div class="row g-3 mb-4">
+
+        <div class="col-xl-4 col-md-6">
+            <div class="stat-card">
+                <div class="d-flex justify-content-between align-items-center">
+                    <span class="stat-label">Total Invested</span>
+                    <div class="stat-icon blue">
+                        <i class="bi bi-wallet2"></i>
+                    </div>
+                </div>
+                <div class="stat-value">
+                    ₹<span th:text="${#numbers.formatDecimal(totalInvested ?: 0, 1, 'COMMA', 2, 'POINT')}">0.00</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-4 col-md-6">
+            <div class="stat-card">
+                <div class="d-flex justify-content-between align-items-center">
+                    <span class="stat-label">Current Value</span>
+                    <div class="stat-icon cyan">
+                        <i class="bi bi-graph-up"></i>
+                    </div>
+                </div>
+                <div class="stat-value">
+                    ₹<span th:text="${#numbers.formatDecimal(currentInvestmentValue ?: 0, 1, 'COMMA', 2, 'POINT')}">0.00</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-4 col-md-12">
+            <div class="stat-card">
+                <div class="d-flex justify-content-between align-items-center">
+                    <span class="stat-label">Overall Profit / Loss</span>
+                    <div class="stat-icon green">
+                        <i class="bi bi-currency-rupee"></i>
+                    </div>
+                </div>
+                <div class="stat-value"
+                     th:classappend="${totalProfitLoss != null and totalProfitLoss < 0} ? 'text-danger' : 'text-success'">
+                    ₹<span th:text="${#numbers.formatDecimal(totalProfitLoss ?: 0, 1, 'COMMA', 2, 'POINT')}">0.00</span>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Add Investment -->
+    <div class="content-card mb-4">
+
+        <div class="mb-4">
+            <h5 class="section-title">Add New Investment</h5>
+            <p class="section-subtitle">Record a new investment and keep track of its performance.</p>
+        </div>
+
+        <form th:action="@{/investments/save}" method="post">
+
+            <div class="row g-3">
+
+                <div class="col-md-6 col-lg-4">
+                    <label class="form-label">Investment Name</label>
+                    <input type="text"
+                           name="investmentName"
+                           class="form-control"
+                           placeholder="e.g. HDFC Mutual Fund"
+                           maxlength="100"
+                           required>
+                </div>
+
+                <div class="col-md-6 col-lg-4">
+                    <label class="form-label">Investment Type</label>
+                    <select name="investmentType" class="form-select" required>
+                        <option value="">Select type</option>
+                        <option value="Stocks">Stocks</option>
+                        <option value="Mutual Funds">Mutual Funds</option>
+                        <option value="Fixed Deposit">Fixed Deposit</option>
+                        <option value="Gold">Gold</option>
+                        <option value="Crypto">Crypto</option>
+                        <option value="Real Estate">Real Estate</option>
+                        <option value="Recurring Deposit">Recurring Deposit</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+
+                <div class="col-md-6 col-lg-4">
+                    <label class="form-label">Invested Amount (₹)</label>
+                    <input type="number"
+                           name="investedAmount"
+                           class="form-control"
+                           placeholder="Enter amount"
+                           min="0.01"
+                           step="0.01"
+                           required>
+                </div>
+
+                <div class="col-md-6 col-lg-4">
+                    <label class="form-label">Current Value (₹)</label>
+                    <input type="number"
+                           name="currentValue"
+                           class="form-control"
+                           placeholder="Enter current value"
+                           min="0"
+                           step="0.01"
+                           required>
+                </div>
+
+                <div class="col-md-6 col-lg-4">
+                    <label class="form-label">Investment Date</label>
+                    <input type="date"
+                           name="investmentDate"
+                           class="form-control"
+                           required>
+                </div>
+
+                <div class="col-md-6 col-lg-4">
+                    <label class="form-label">Notes</label>
+                    <input type="text"
+                           name="notes"
+                           class="form-control"
+                           placeholder="Optional notes"
+                           maxlength="500">
+                </div>
+
+                <div class="col-12">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-plus-lg me-1"></i> Add Investment
+                    </button>
+                </div>
+
+            </div>
+        </form>
+    </div>
+
+    <!-- Investment List -->
+    <div class="content-card">
+
+        <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+            <div>
+                <h5 class="section-title">Your Investments</h5>
+                <p class="section-subtitle mb-0">View and manage all your recorded investments.</p>
+            </div>
+
+            <input type="text"
+                   id="investmentSearch"
+                   class="form-control search-box"
+                   placeholder="Search investments...">
+        </div>
+
+        <div class="table-responsive">
+            <table class="table" id="investmentTable">
+
+                <thead>
+                <tr>
+                    <th>Investment</th>
+                    <th>Date</th>
+                    <th>Invested Amount</th>
+                    <th>Current Value</th>
+                    <th>Profit / Loss</th>
+                    <th>Action</th>
+                </tr>
+                </thead>
+
+                <tbody>
+
+                <tr th:each="investment : ${investments}">
+                    <td>
+                        <div class="investment-name"
+                             th:text="${investment.investmentName}">Investment Name</div>
+                        <div class="investment-type"
+                             th:text="${investment.investmentType}">Investment Type</div>
+                    </td>
+
+                    <td th:text="${investment.investmentDate != null ? #temporals.format(investment.investmentDate, 'dd MMM yyyy') : '-'}">
+                        Date
+                    </td>
+
+                    <td>
+                        ₹<span th:text="${#numbers.formatDecimal(investment.investedAmount, 1, 'COMMA', 2, 'POINT')}">0.00</span>
+                    </td>
+
+                    <td>
+                        ₹<span th:text="${#numbers.formatDecimal(investment.currentValue, 1, 'COMMA', 2, 'POINT')}">0.00</span>
+                    </td>
+
+                    <td>
+                        <span th:with="profit=${investment.currentValue.subtract(investment.investedAmount)}"
+                              th:class="${profit.compareTo(T(java.math.BigDecimal).ZERO) >= 0} ? 'profit' : 'loss'">
+                            <span th:text="${profit.compareTo(T(java.math.BigDecimal).ZERO) >= 0 ? '+' : '-'}">+</span>
+                            ₹<span th:text="${#numbers.formatDecimal(profit.abs(), 1, 'COMMA', 2, 'POINT')}">0.00</span>
+                        </span>
+                    </td>
+
+                    <td>
+                        <form th:action="@{/investments/delete/{id}(id=${investment.id})}"
+                              method="post"
+                              onsubmit="return confirm('Are you sure you want to delete this investment?');">
+                            <button type="submit"
+                                    class="btn btn-sm btn-outline-danger"
+                                    title="Delete investment">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+
+                <tr th:if="${#lists.isEmpty(investments)}">
+                    <td colspan="6">
+                        <div class="empty-state">
+                            <i class="bi bi-graph-up-arrow"></i>
+                            <h6>No investments yet</h6>
+                            <p class="mb-0">Add your first investment to start tracking your financial growth.</p>
+                        </div>
+                    </td>
+                </tr>
+
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+
+    <div class="text-center mt-4">
+        <small class="text-secondary">Viscaly · Smart Finance. Clear Future.</small>
+    </div>
+
+</main>
+
+<script>
+    document.getElementById("investmentSearch").addEventListener("input", function () {
+        const searchValue = this.value.toLowerCase();
+        const rows = document.querySelectorAll("#investmentTable tbody tr");
+
+        rows.forEach(function (row) {
+            const text = row.textContent.toLowerCase();
+            row.style.display = text.includes(searchValue) ? "" : "none";
+        });
+    });
+
+    document.querySelector('input[name="investmentDate"]').value =
+        new Date().toISOString().split("T")[0];
+</script>
+
+</body>
+</html>

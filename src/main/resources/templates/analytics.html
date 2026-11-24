@@ -1,0 +1,711 @@
+
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analytics | Viscaly</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        :root {
+            --primary: #4776e6;
+            --secondary: #27c2d8;
+            --dark: #172b4d;
+            --muted: #8492a6;
+            --background: #f3f7fd;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            background: var(--background);
+            color: var(--dark);
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 245px;
+            height: 100vh;
+            padding: 28px 18px;
+            background: white;
+            border-right: 1px solid #e9eef6;
+            z-index: 100;
+        }
+
+        .brand {
+            font-size: 27px;
+            font-weight: 800;
+            letter-spacing: -1px;
+            color: var(--primary);
+            padding: 0 12px;
+        }
+
+        .brand span {
+            color: var(--secondary);
+        }
+
+        .tagline {
+            font-size: 10px;
+            color: var(--muted);
+            padding-left: 13px;
+            margin-bottom: 38px;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 13px;
+            padding: 12px 14px;
+            margin-bottom: 7px;
+            border-radius: 11px;
+            color: #718096;
+            font-size: 14px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: 0.2s;
+        }
+
+        .nav-link:hover,
+        .nav-link.active {
+            background: #edf3ff;
+            color: var(--primary);
+        }
+
+        .nav-link i {
+            font-size: 18px;
+        }
+
+        .main-content {
+            margin-left: 245px;
+            padding: 30px 35px;
+        }
+
+        .topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .page-title {
+            font-size: 25px;
+            font-weight: 750;
+            margin: 0;
+        }
+
+        .welcome {
+            color: var(--muted);
+            font-size: 13px;
+            margin-top: 5px;
+        }
+
+        .profile {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: white;
+            padding: 9px 15px;
+            border-radius: 12px;
+            box-shadow: 0 3px 15px rgba(30, 60, 100, 0.04);
+        }
+
+        .profile-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: #eaf1ff;
+            color: var(--primary);
+            display: grid;
+            place-items: center;
+        }
+
+        .profile-name {
+            font-size: 13px;
+            font-weight: 650;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 17px;
+            padding: 22px;
+            height: 100%;
+            box-shadow: 0 5px 20px rgba(30, 60, 100, 0.04);
+        }
+
+        .stat-label {
+            color: var(--muted);
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: 750;
+            margin-top: 13px;
+            overflow-wrap: anywhere;
+        }
+
+        .stat-icon {
+            width: 43px;
+            height: 43px;
+            border-radius: 12px;
+            display: grid;
+            place-items: center;
+            font-size: 20px;
+        }
+
+        .blue {
+            background: #eaf1ff;
+            color: #4776e6;
+        }
+
+        .cyan {
+            background: #e4faff;
+            color: #16a9c5;
+        }
+
+        .green {
+            background: #e6f8ef;
+            color: #20a66a;
+        }
+
+        .red {
+            background: #fff0f0;
+            color: #e15b64;
+        }
+
+        .content-card {
+            background: white;
+            border-radius: 17px;
+            padding: 24px;
+            height: 100%;
+            box-shadow: 0 5px 20px rgba(30, 60, 100, 0.04);
+        }
+
+        .section-title {
+            font-size: 17px;
+            font-weight: 750;
+            margin-bottom: 5px;
+        }
+
+        .section-subtitle {
+            font-size: 12px;
+            color: var(--muted);
+        }
+
+        .chart-container {
+            position: relative;
+            height: 290px;
+            width: 100%;
+            margin-top: 20px;
+        }
+
+        .chart-container.small {
+            height: 250px;
+        }
+
+        .filter-select {
+            border: 1px solid #e5eaf2;
+            border-radius: 9px;
+            padding: 9px 12px;
+            font-size: 12px;
+            color: var(--dark);
+            background: white;
+        }
+
+        .insight-item {
+            display: flex;
+            align-items: center;
+            gap: 13px;
+            padding: 14px 0;
+            border-bottom: 1px solid #edf0f5;
+        }
+
+        .insight-item:last-child {
+            border-bottom: none;
+        }
+
+        .insight-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 11px;
+            display: grid;
+            place-items: center;
+            font-size: 17px;
+            background: #edf3ff;
+            color: var(--primary);
+        }
+
+        .insight-label {
+            font-size: 12px;
+            color: var(--muted);
+        }
+
+        .insight-value {
+            font-size: 14px;
+            font-weight: 700;
+            margin-top: 3px;
+        }
+
+        .logout-btn {
+            border: none;
+            background: transparent;
+            width: 100%;
+            text-align: left;
+        }
+
+        @media (max-width: 900px) {
+            .sidebar {
+                width: 75px;
+                padding: 25px 10px;
+            }
+
+            .brand {
+                font-size: 20px;
+                padding: 0 7px;
+            }
+
+            .tagline,
+            .nav-text {
+                display: none;
+            }
+
+            .nav-link {
+                justify-content: center;
+                padding: 13px 8px;
+            }
+
+            .main-content {
+                margin-left: 75px;
+                padding: 25px 18px;
+            }
+        }
+
+        @media (max-width: 550px) {
+            .main-content {
+                padding: 20px 12px;
+            }
+
+            .topbar {
+                align-items: flex-start;
+            }
+
+            .page-title {
+                font-size: 21px;
+            }
+
+            .profile {
+                padding: 7px;
+            }
+
+            .profile-name {
+                display: none;
+            }
+
+            .content-card {
+                padding: 17px;
+            }
+
+            .chart-container {
+                height: 240px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<aside class="sidebar">
+    <div class="brand">Visca<span>ly.</span></div>
+    <div class="tagline">SMART FINANCE. CLEAR FUTURE.</div>
+
+    <nav>
+        <a href="/dashboard" class="nav-link">
+            <i class="bi bi-grid-1x2"></i>
+            <span class="nav-text">Dashboard</span>
+        </a>
+
+        <a href="/transactions" class="nav-link">
+            <i class="bi bi-arrow-left-right"></i>
+            <span class="nav-text">Transactions</span>
+        </a>
+
+        <a href="/investments" class="nav-link">
+            <i class="bi bi-graph-up-arrow"></i>
+            <span class="nav-text">Investments</span>
+        </a>
+
+        <a href="/goals" class="nav-link">
+            <i class="bi bi-bullseye"></i>
+            <span class="nav-text">Goals & Savings</span>
+        </a>
+
+        <a href="/analytics" class="nav-link active">
+            <i class="bi bi-bar-chart-line"></i>
+            <span class="nav-text">Analytics</span>
+        </a>
+
+        <form th:action="@{/logout}" method="post" class="mt-4">
+            <button type="submit" class="nav-link logout-btn">
+                <i class="bi bi-box-arrow-left"></i>
+                <span class="nav-text">Logout</span>
+            </button>
+        </form>
+    </nav>
+</aside>
+
+<main class="main-content">
+
+    <div class="topbar">
+        <div>
+            <h1 class="page-title">Financial Analytics</h1>
+            <p class="welcome">Understand your spending habits and financial performance.</p>
+        </div>
+
+        <div class="profile">
+            <div class="profile-icon">
+                <i class="bi bi-person-fill"></i>
+            </div>
+            <span class="profile-name" th:text="${userName}">User</span>
+        </div>
+    </div>
+
+    <!-- Financial Summary -->
+    <div class="row g-3 mb-4">
+
+        <div class="col-xl-3 col-md-6">
+            <div class="stat-card">
+                <div class="d-flex justify-content-between align-items-center">
+                    <span class="stat-label">Total Income</span>
+                    <div class="stat-icon green">
+                        <i class="bi bi-arrow-down-left"></i>
+                    </div>
+                </div>
+                <div class="stat-value text-success">
+                    ₹<span th:text="${#numbers.formatDecimal(totalIncome ?: 0, 1, 'COMMA', 2, 'POINT')}">0.00</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6">
+            <div class="stat-card">
+                <div class="d-flex justify-content-between align-items-center">
+                    <span class="stat-label">Total Expenses</span>
+                    <div class="stat-icon red">
+                        <i class="bi bi-arrow-up-right"></i>
+                    </div>
+                </div>
+                <div class="stat-value text-danger">
+                    ₹<span th:text="${#numbers.formatDecimal(totalExpenses ?: 0, 1, 'COMMA', 2, 'POINT')}">0.00</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6">
+            <div class="stat-card">
+                <div class="d-flex justify-content-between align-items-center">
+                    <span class="stat-label">Net Savings</span>
+                    <div class="stat-icon blue">
+                        <i class="bi bi-piggy-bank"></i>
+                    </div>
+                </div>
+                <div class="stat-value">
+                    ₹<span th:text="${#numbers.formatDecimal(netSavings ?: 0, 1, 'COMMA', 2, 'POINT')}">0.00</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6">
+            <div class="stat-card">
+                <div class="d-flex justify-content-between align-items-center">
+                    <span class="stat-label">Savings Rate</span>
+                    <div class="stat-icon cyan">
+                        <i class="bi bi-percent"></i>
+                    </div>
+                </div>
+                <div class="stat-value">
+                    <span th:text="${#numbers.formatDecimal(savingsRate ?: 0, 1, 1)}">0.0</span>%
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Charts Row 1 -->
+    <div class="row g-3 mb-4">
+
+        <div class="col-lg-8">
+            <div class="content-card">
+                <div>
+                    <h5 class="section-title">Income vs Expenses</h5>
+                    <p class="section-subtitle">Compare your monthly income and expenses.</p>
+                </div>
+
+                <div class="chart-container">
+                    <canvas id="incomeExpenseChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="content-card">
+                <div>
+                    <h5 class="section-title">Income & Expense Split</h5>
+                    <p class="section-subtitle">See how your money is distributed.</p>
+                </div>
+
+                <div class="chart-container small">
+                    <canvas id="financePieChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Charts Row 2 -->
+    <div class="row g-3 mb-4">
+
+        <div class="col-lg-7">
+            <div class="content-card">
+                <div>
+                    <h5 class="section-title">Monthly Expense Trend</h5>
+                    <p class="section-subtitle">Track how your spending changes over time.</p>
+                </div>
+
+                <div class="chart-container">
+                    <canvas id="expenseTrendChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-5">
+            <div class="content-card">
+                <div>
+                    <h5 class="section-title">Financial Overview</h5>
+                    <p class="section-subtitle">A quick look at your financial activity.</p>
+                </div>
+
+                <div class="mt-3">
+
+                    <div class="insight-item">
+                        <div class="insight-icon">
+                            <i class="bi bi-wallet2"></i>
+                        </div>
+                        <div>
+                            <div class="insight-label">Total Transactions</div>
+                            <div class="insight-value" th:text="${transactionCount ?: 0}">0</div>
+                        </div>
+                    </div>
+
+                    <div class="insight-item">
+                        <div class="insight-icon">
+                            <i class="bi bi-graph-up-arrow"></i>
+                        </div>
+                        <div>
+                            <div class="insight-label">Total Invested</div>
+                            <div class="insight-value">
+                                ₹<span th:text="${#numbers.formatDecimal(totalInvested ?: 0, 1, 'COMMA', 2, 'POINT')}">0.00</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="insight-item">
+                        <div class="insight-icon">
+                            <i class="bi bi-bullseye"></i>
+                        </div>
+                        <div>
+                            <div class="insight-label">Savings Goals</div>
+                            <div class="insight-value" th:text="${activeGoals ?: 0}">0</div>
+                        </div>
+                    </div>
+
+                    <div class="insight-item">
+                        <div class="insight-icon">
+                            <i class="bi bi-calendar-check"></i>
+                        </div>
+                        <div>
+                            <div class="insight-label">Average Monthly Expense</div>
+                            <div class="insight-value">
+                                ₹<span th:text="${#numbers.formatDecimal(averageMonthlyExpense ?: 0, 1, 'COMMA', 2, 'POINT')}">0.00</span>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="text-center mt-4">
+        <small class="text-secondary">Viscaly · Smart Finance. Clear Future.</small>
+    </div>
+
+</main>
+
+<script th:inline="javascript">
+    const monthlyLabels = /*[[${monthlyLabels}]]*/ [];
+    const monthlyIncome = /*[[${monthlyIncome}]]*/ [];
+    const monthlyExpenses = /*[[${monthlyExpenses}]]*/ [];
+    const expenseLabels = /*[[${expenseLabels}]]*/ [];
+    const expenseValues = /*[[${expenseValues}]]*/ [];
+
+    const totalIncome = Number(/*[[${totalIncome}]]*/ 0) || 0;
+    const totalExpenses = Number(/*[[${totalExpenses}]]*/ 0) || 0;
+
+    Chart.defaults.font.family = "'Segoe UI', sans-serif";
+    Chart.defaults.color = "#8492a6";
+
+    // Income vs Expenses
+    new Chart(document.getElementById("incomeExpenseChart"), {
+        type: "bar",
+        data: {
+            labels: monthlyLabels,
+            datasets: [
+                {
+                    label: "Income",
+                    data: monthlyIncome,
+                    backgroundColor: "#4776e6",
+                    borderRadius: 6,
+                    maxBarThickness: 35
+                },
+                {
+                    label: "Expenses",
+                    data: monthlyExpenses,
+                    backgroundColor: "#27c2d8",
+                    borderRadius: 6,
+                    maxBarThickness: 35
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            interaction: {
+                mode: "index",
+                intersect: false
+            },
+            plugins: {
+                legend: {
+                    position: "top",
+                    align: "end"
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function (context) {
+                            return context.dataset.label + ": ₹" +
+                                Number(context.raw).toLocaleString("en-IN");
+                        }
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    grid: { display: false }
+                },
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        callback: function (value) {
+                            return "₹" + Number(value).toLocaleString("en-IN");
+                        }
+                    }
+                }
+            }
+        }
+    });
+
+    // Income and Expense Split
+    new Chart(document.getElementById("financePieChart"), {
+        type: "doughnut",
+        data: {
+            labels: ["Income", "Expenses"],
+            datasets: [{
+                data: [totalIncome, totalExpenses],
+                backgroundColor: ["#4776e6", "#27c2d8"],
+                borderWidth: 0,
+                hoverOffset: 8
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            cutout: "68%",
+            plugins: {
+                legend: {
+                    position: "bottom"
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function (context) {
+                            return context.label + ": ₹" +
+                                Number(context.raw).toLocaleString("en-IN");
+                        }
+                    }
+                }
+            }
+        }
+    });
+
+    // Expense Trend
+    new Chart(document.getElementById("expenseTrendChart"), {
+        type: "line",
+        data: {
+            labels: monthlyLabels,
+            datasets: [{
+                label: "Monthly Expenses",
+                data: monthlyExpenses,
+                borderColor: "#4776e6",
+                backgroundColor: "rgba(71, 118, 230, 0.12)",
+                fill: true,
+                tension: 0.4,
+                pointRadius: 4,
+                pointHoverRadius: 6
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function (context) {
+                            return "Expenses: ₹" +
+                                Number(context.raw).toLocaleString("en-IN");
+                        }
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    grid: { display: false }
+                },
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        callback: function (value) {
+                            return "₹" + Number(value).toLocaleString("en-IN");
+                        }
+                    }
+                }
+            }
+        }
+    });
+</script>
+
+</body>
+</html>
